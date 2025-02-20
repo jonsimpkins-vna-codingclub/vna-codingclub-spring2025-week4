@@ -1,0 +1,322 @@
+<html>
+<head>
+    <title>VNA Coding Club, Week 4</title>
+
+    <link href="helpers/styles.css" rel="stylesheet" />
+
+    <script src="helpers/helper_methods.js"></script>
+    <script type="text/javascript">window.addEventListener('error', onError);</script>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <h1 class="headline">VNA Coding Club, Week 4</h1>
+
+    <div class="wrapper">
+        <div class="wrapper-direct-child">
+            <div class="button-row">
+                <button id="prev-btn" onclick="prevInstructions()"><-</button>
+                <button id="next-btn" onclick="nextInstructions()">-></button>
+            </div>
+            <div id="instructions"></div>
+        </div>
+        
+        <div class="wrapper-direct-child">
+            <button id="execute-button" onclick="executeBtn()"></button>
+
+            <div id="success-msg" onclick="location.reload()"></div>
+
+            <div>Output:</div>
+            <pre id="error"></pre>
+            
+            <pre id="console">... this is where the code output will go...</pre>
+        </div>
+    </div>
+
+    
+<!-- Step-by-step instructions, in Markdown -->
+<script id="step0" type="text/plain">
+# Step 0
+
+Welcome back!
+
+> This week we're going to start working with
+**"multi-dimensional arrays"**.
+
+We assume that you've finished all the way through Step 2 of the
+Week 3 exercises. If you haven't finished that yet, feel free to
+go back and finish that now, and we'll see you
+when you're done.
+
+## 1-Dimensional Arrays - review
+
+We've already worked with 1D arrays: they're the variable type
+that we've used when we want to represent "an ordered list of stuff".
+
+An array has a `.length` property that lets us know how long the array
+is, and we can use `[]` to access specific elements of the array
+by their **0-based** index:
+
+```
+let x = [27, 3, 15, 1];
+
+let y = x[1]; // 3
+
+let numElementsBiggerThan10 = 0;
+for (let i = 0; i < x.length; i++) {
+    if (x[i] > 10) {
+        numElementsBiggerThan10++;
+    }
+}
+let z = numElementsBiggerThan10; // 2
+```
+
+## 1D Array Challenge
+
+For the first challenge in `step_0.js`, we'll implement a method
+that gets two different arrays of numbers (one short, one long).
+
+For the short array:
+
+* Add up all the elements and log the result
+* Log the largest element
+
+For the long array:
+
+* _Efficiently_ find the 1001st element of the array and log the value
+
+> **CHALLENGE**: to proceed, go ahead and update
+`step_0.js` to `log()` the required values
+</script>
+
+<script id="step1" type="text/plain">
+# Step 1
+
+Now let's talk about 2D arrays - arrays **of** arrays
+
+## Can you put an array in an array?
+
+We've said before that each element of an array can contain
+a variable of any valid type:
+
+```
+let w = [1, 2, 7, 23]; // Array of numbers
+let x = ['foo', 'bar', 'baz']; // Array of strings
+let y = [true, false, false]; // Array of booleans
+let z = [null, null, null]; // Array of null values
+```
+
+But what about if we wanted to put **arrays** as the value
+of each element of an array? This is not only possible,
+but also really powerful:
+
+```
+let ticTacToeBoard = [
+    ['X', '-', 'O'],
+    ['X', 'O', '-'],
+    ['X', '-', '-'],
+];
+
+let firstRow = ticTacToeBoard[0]; // ['X', '-', 'O']
+let thirdRow = ticTacToeBoard[2]; // ['X', '-', '-']
+```
+
+So each element of the `ticTacToeBoard` array is an array,
+and we can think of it as the **row** of a 2D grid.
+
+And then each element of the row can be thought of as the
+value for the **column** in that row.
+
+## How many rows or columns?
+
+Consider this example:
+
+```
+let myGrid = [
+    [1, 2, 7],
+    [9, 3, 5],
+];
+
+let numRows = myGrid.length; // 2
+let numCols = myGrid[0].length; // 3
+let middleFirstRow = myGrid[0][1]; // 2
+```
+
+The variable `myGrid`:
+
+* Is an array containing arrays of numbers
+* Has two elements in it (rows)
+* Each row is an array containing 3 numbers
+
+> **Check-in:** Why is `middleFirstRow` equal to `2` in the above example?
+`myGrid[0]` is equal to the entire first row `[1, 2, 7]`, and then
+the `[1]` at the end is grabbing the 2nd element of that row.
+
+## Challenge Time
+
+Ok, for the challenge for Step 1, we're going to implement a function
+that will be given a grid of numbers:
+
+* Log the number of rows / columns as a pair (e.g. `(5, 2)`)
+* Log the value of the 2nd column, 1st row
+* Log the sum of all the values in the 2nd row
+* Log the sum of all the values in the 1st column
+* Log the sum of the values in the 4 corners of the grid
+
+Got all that? Awesome, let's get started!
+
+> **Challenge**: update `step_1.js` log the needed data
+
+
+</script>
+
+<script id="step2" type="text/plain">
+# Step 2
+
+Let's talk about how to check values **next to** a location in a 2D grid.
+
+## Who is my neighbor?
+
+Suppose that you have a 2D grid, representing something like a map,
+and we have a (row, column) pair representing our location on the map:
+
+```
+let myMap = [
+    ['-', '-', '-', 'x', 'T'],
+    ['-', '-', '-', 'x', '-'],
+    ['-', 'P', 'x', 'x', '-'],
+    ['-', '-', '-', '-', '-'],
+    ['-', '-', '-', '-', '-'],
+];
+
+let currentLocation = [2, 1]; // Row = 2, Col = 1
+```
+
+And suppose the map uses:
+
+* '-' to indicate a space where we cannot walk
+* 'P' to indicate a space we've already been
+* 'x' to indicate a space we could go (but haven't yet)
+* 'T' to indicate treasure
+
+Given this setup, let's ask an initial question:
+
+> **Question:** what is the value of `myMap` corresponding
+to the location `currentLocation`? We can fetch this with
+`myMap[currentLocation[0]][currentLocation[1]]`, which in
+this case would result in the value `'P'`
+
+Now, suppose that we want to know where we're allowed to walk
+next on the map. How can we check the option 1 space to the right?
+
+> **Question:** how would we check the value of `myMap` that
+is one space to the right of `currentLocation`? We would keep the
+same row as `currentLocation`, and increase the column by 1:
+`myMap[currentLocation[0]][currentLocation[1] + 1]`, which in
+this case would result in the value `'x'`
+
+Ok, so we have a good option to the right. What about moving
+down from our current location?
+
+> **Question:** how would we check the value of `myMap` that
+is one space "down" from `currentLocation`? We would increase
+the row by 1, and keep the column the same as `currentLocation`:
+`myMap[currentLocation[0] + 1][currentLocation[1]]`, which in
+this case would result in the value `'-'`
+
+## Modifying values in a 2D array
+
+Suppose that using the previous example with the map, we want to
+move one step to the right:
+
+```
+let myMap = [
+    ['-', '-', '-', 'x', 'T'],
+    ['-', '-', '-', 'x', '-'],
+    ['-', 'P', 'x', 'x', '-'],
+    ['-', '-', '-', '-', '-'],
+    ['-', '-', '-', '-', '-'],
+];
+
+let originalLocation = [2, 1]; // Row = 2, Col = 1
+let newLocation = [
+    originalLocation[0],
+    originalLocation[1] + 1
+];  // Row = 2, Col = 2
+```
+
+But now, we want to update the map with a `'P'` to remember where
+we've gone so far! How can we do that?
+
+If we wanted to read the value at `(2,2)` on the map, we would just do:
+
+```
+let valueInCenter = myMap[2][2];
+```
+
+and it turns out the same syntax works the other way around for assigning
+a new value:
+
+```
+// Mark our new location on the map
+myMap[newLocation[0]][newLocation[1]] = 'P';
+
+// New value of myMap:
+// [
+//     ['-', '-', '-', 'x', 'T'],
+//     ['-', '-', '-', 'x', '-'],
+//     ['-', 'P', 'P', 'x', '-'],
+//     ['-', '-', '-', '-', '-'],
+//     ['-', '-', '-', '-', '-'],
+// ]
+```
+
+## What about when our neighbor doesn't exist?
+
+With this example of searching up/down/left/right for neighbors on a map,
+there's a situation where we can hit bugs. For example:
+
+```
+let myMap = [
+    ['-', '-', '-', 'P', 'T'],
+    ['-', '-', '-', 'P', '-'],
+    ['-', 'P', 'P', 'P', '-'],
+    ['-', '-', '-', '-', '-'],
+    ['-', '-', '-', '-', '-'],
+];
+
+let currentLocation = [0, 3]; // Row = 0, Col = 3
+```
+
+In this state, we're nearly to the treasure! So we look nearby to see
+which of our neighbors might be the treasure, and maybe we start by looking
+one space **above** our current location.
+
+> **Question:** what goes wrong when we try to check the space above?
+We would decrease the row by 1, meaning we would check row `-1`, which does
+not exist!
+
+The callout here is that as you check neighbors, you also have to verify
+first that the (row, column) location you're about to check is within
+the range of the grid! That means between `0` and `rows - 1` for the row (inclusive),
+and between `0` and `cols - 1` for the column (inclusive).
+
+## Challenge time
+
+For the `step_2.js` challenge, you're going to be given a treasure map
+like in the above examples, and given a starting location on that map.
+
+**Your task** is to follow the `x` spaces on the map to the treasure,
+and then log:
+
+* How many steps it took
+* The (row, column) location of the treasure
+
+</script>
+
+    <!-- This script runs at the end, intentionally -->
+    <script>
+        documentReady();
+    </script>
+</body>
+</html>
